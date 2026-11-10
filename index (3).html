@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Living Folio — Your Reading & Wellness Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  /* ─── CSS Variables ─── */
+  :root {
+    --bg-parchment:   #f5efe0;
+    --bg-cream:       #faf6ed;
+    --bg-warm:        #ede4d0;
+    --sidebar-bg:     #2c1f0e;
+    --sidebar-hover:  #3d2b14;
+    --sidebar-active: #5a3e20;
+    --topbar-bg:      #f0e6d0;
+    --topbar-border:  #d4b896;
+    --brown-dark:     #3d2b14;
+    --brown-mid:      #6b4a2a;
+    --brown-light:    #9c7147;
+    --amber:          #c8873a;
+    --amber-light:    #e8a84a;
+    --amber-pale:     #f2d6a2;
+    --amber-glow:     #ffedc0;
+    --ink:            #2c1f0e;
+    --ink-mid:        #4a3520;
+    --ink-soft:       #7a5c3a;
+    --border-warm:    #d6c4a0;
+    --border-soft:    #e8d9be;
+    --card-bg:        #fdf8ef;
+    --card-shadow:    rgba(60,35,10,0.12);
+    --font-display:   'Playfair Display', Georgia, serif;
+    --font-body:      'Lora', Georgia, serif;
+    --font-text:      'Crimson Text', Georgia, serif;
+    --radius-sm:      6px;
+    --radius-md:      12px;
+    --radius-lg:      18px;
+    --radius-xl:      24px;
+    --transition:     0.25s ease;
+  }
+
+  /* ─── Reset & Base ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--bg-parchment);
+    overflow: hidden;
+  }
+
+  /* Paper texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: var(--bg-warm); }
+  ::-webkit-scrollbar-thumb { background: var(--amber); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--amber-light); }
+
+  /* ─── Keyframes ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes breatheExpand {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.55); }
+  }
+  @keyframes pulseRing {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    100% { transform: scale(1.9); opacity: 0; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ─── Layout ─── */
+  #app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ─── Sidebar ─── */
+  #sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    box-shadow: 3px 0 20px rgba(0,0,0,0.3);
+  }
+  #sidebar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .sidebar-logo {
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+  }
+  .sidebar-logo .logo-icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .sidebar-logo h1 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--amber-light);
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+  .sidebar-logo p {
+    font-family: var(--font-text);
+    font-size: 0.78rem;
+    color: rgba(255,200,100,0.5);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 0;
+  }
+  .nav-section-label {
+    font-family: var(--font-text);
+    font-size: 0.65rem;
+    color: rgba(255,200,100,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 10px 20px 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    color: rgba(255,220,160,0.65);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all var(--transition);
+    position: relative;
+    border-left: 2px solid transparent;
+  }
+  .nav-item .nav-icon { font-size: 1.05rem; flex-shrink: 0; }
+  .nav-item:hover {
+    background: var(--sidebar-hover);
+    color: var(--amber-pale);
+    border-left-color: rgba(200,135,58,0.4);
+  }
+  .nav-item.active {
+    background: var(--sidebar-active);
+    color: var(--amber-light);
+    border-left-color: var(--amber);
+  }
+
+  .sidebar-footer {
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    font-family: var(--font-text);
+    font-size: 0.72rem;
+    color: rgba(255,200,100,0.25);
+    font-style: italic;
+    position: relative;
+  }
+
+  /* ─── Main Area ─── */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-cream);
+  }
+
+  /* ─── Topbar ─── */
+  #topbar {
+    background: var(--topbar-bg);
+    border-bottom: 1px solid var(--topbar-border);
+    padding: 0 30px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(60,35,10,0.06);
+  }
+  #topbar-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    font-style: italic;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar-time {
+    font-family: var(--font-text);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  /* ─── Content Panels ─── */
+  #content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .panel {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 30px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .panel.active { display: block; }
+
+  /* ─── Cards & Common ─── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: 0 2px 12px var(--card-shadow);
+    animation: fadeUp 0.35s ease both;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-family: var(--font-text);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 22px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all var(--transition);
+  }
+  .btn-primary {
+    background: var(--amber);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--amber-light); transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--bg-warm);
+    color: var(--brown-mid);
+    border: 1px solid var(--border-warm);
+  }
+  .btn-secondary:hover { background: var(--amber-pale); }
+  .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+
+  /* ─── PANEL: AI COMPANION ─── */
+  #panel-chat {
+    display: none;
+    flex-direction: column;
+    padding: 0;
+  }
+  #panel-chat.active { display: flex; }
+
+  .chat-topbar {
+    padding: 18px 30px 14px;
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--bg-cream);
+    flex-shrink: 0;
+  }
+
+  .api-key-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-pale);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+  }
+  .api-key-bar label {
+    font-family: var(--font-text);
+    font-size: 0.82rem;
+    color: var(--brown-mid);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .api-key-bar input {
+    flex: 1;
+    border: 1px solid var(--border-warm);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    font-family: var(--font-text);
+    font-size: 0.82rem;
+    background: white;
+    color: var(--ink);
+    outline: none;
+  }
+  .api-key-bar input:focus { border-color: var(--amber); }
+  .api-key-bar .btn { flex-shrink: 0; }
+
+  .folio-persona {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .folio-avatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--amber), var(--brown-mid));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(200,135,58,0.3);
+  }
+  .folio-info h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+  }
+  .folio-info p {
+    font-family: var(--font-text);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .folio-status {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #5cb85c;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+  .quick-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .quick-btn {
+    padding: 7px 13px;
+    background: var(--bg-warm);
+    border: 1px solid var(--border-warm);
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-text);
+    font-size: 0.82rem;
+    color: var(--brown-mid);
+    transition: all var(--transition);
+    font-style: italic;
+  }
+  .quick-btn:hover {
+    background: var(--amber-pale);
+    border-color: var(--amber);
+    color: var(--brown-dark);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    animation: fadeUp 0.3s ease both;
+    max-width: 85%;
+  }
+  .msg-folio { align-self: flex-start; }
+  .msg-user  { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .msg-folio .msg-avatar { background: linear-gradient(135deg, var(--amber), var(--brown-mid)); }
+  .msg-user  .msg-avatar { background: var(--bg-warm); border: 1px solid var(--border-warm); }
+
+  .msg-bubble {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-text);
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: var(--ink);
+    max-width: 100%;
+  }
+  .msg-folio .msg-bubble {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px var(--card-shadow);
+  }
+  .msg-user .msg-bubble {
+    background: linear-gradient(135deg, var(--amber), #b8742a);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg-bubble em { font-style: italic; color: var(--amber); }
+  .msg-user .msg-bubble em { color: var(--amber-pale); }
+
+  .typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .typing-dots span {
+    width: 7px; height: 7px;
+    background: var(--amber);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+    40%            { transform: scale(1);   opacity: 1; }
+  }
+
+  .chat-input-area {
+    padding: 16px 30px 20px;
+    border-top: 1px solid var(--border-soft);
+    background: var(--bg-cream);
+    flex-shrink: 0;
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  #chat-input {
+    flex: 1;
+    border: 1px solid var(--border-warm);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-family: var(--font-text);
+    font-size: 0.97rem;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    resize: none;
+    min-height: 46px;
+    max-height: 120px;
+    line-height: 1.5;
+    transition: border-color var(--transition);
+  }
+  #chat-input:focus { border-color: var(--amber); }
+  #chat-send {
+    width: 46px; height: 46px;
+    background: var(--amber);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    color: white;
+    flex-shrink: 0;
+  }
+  #chat-send:hover { background: var(--amber-light); transform: scale(1.05); }
+
+  /* ─── PANEL: LIBRARY ─── */
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .search-input {
+    flex: 1;
+    border: 1px solid var(--border-warm);
+    border-radius: var(--radius-sm);
+    padding: 11px 16px;
+    font-family: var(--font-text);
+    font-size: 0.97rem;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    transition: border-color var(--transition);
+  }
+  .search-input:focus { border-color: var(--amber); }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 18px;
+  }
+  .book-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition);
+    animation: fadeUp 0.35s ease both;
+    box-shadow: 0 2px 8px var(--card-shadow);
+  }
+  .book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--card-shadow);
+    border-color: var(--amber-pale);
+  }
+  .book-cover {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    background: var(--bg-warm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+  }
+  .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .book-cover-placeholder {
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: linear-gradient(135deg, var(--bg-warm), var(--amber-pale));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+  }
+  .book-info {
+    padding: 10px 12px;
+  }
+  .book-title {
+    font-family: var(--font-display);
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    line-height: 1.3;
+    margin-bottom: 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .book-author {
+    font-family: var(--font-text);
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .book-year {
+    font-family: var(--font-text);
+    font-size: 0.72rem;
+    color: var(--amber);
+    margin-top: 4px;
+  }
+
+  .library-empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+  }
+  .library-empty .empty-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.5; }
+  .library-empty p { font-family: var(--font-text); font-style: italic; font-size: 1.05rem; }
+
+  /* ─── Reader Modal ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,10,0,0.75);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(4px);
+  }
+  .modal-box {
+    background: var(--bg-cream);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    animation: fadeUp 0.3s ease;
+  }
+  .modal-header {
+    padding: 22px 26px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .modal-cover {
+    width: 70px;
+    height: 105px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--bg-warm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    overflow: hidden;
+  }
+  .modal-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-meta { flex: 1; }
+  .modal-meta h2 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .modal-meta .author {
+    font-family: var(--font-text);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .modal-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    align-self: flex-start;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--bg-warm); color: var(--brown-dark); }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 26px;
+  }
+  .modal-body p {
+    font-family: var(--font-text);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .modal-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 10px;
+  }
+  .ext-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-warm);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-text);
+    font-size: 0.85rem;
+    color: var(--brown-mid);
+    text-decoration: none;
+    background: var(--bg-warm);
+    transition: all var(--transition);
+  }
+  .ext-link:hover { background: var(--amber-pale); border-color: var(--amber); }
+
+  /* ─── PANEL: RECOMMENDATIONS ─── */
+  .genre-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .genre-tab {
+    padding: 8px 16px;
+    background: var(--bg-warm);
+    border: 1px solid var(--border-warm);
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-text);
+    font-size: 0.85rem;
+    color: var(--brown-mid);
+    transition: all var(--transition);
+    font-style: italic;
+  }
+  .genre-tab:hover { background: var(--amber-pale); border-color: var(--amber-pale); }
+  .genre-tab.active {
+    background: var(--amber);
+    color: white;
+    border-color: var(--amber);
+    font-weight: 600;
+  }
+
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .rec-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    animation: fadeUp 0.35s ease both;
+    box-shadow: 0 2px 10px var(--card-shadow);
+    transition: all var(--transition);
+  }
+  .rec-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px var(--card-shadow);
+  }
+  .rec-emoji { font-size: 32px; margin-bottom: 10px; }
+  .rec-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--brown-dark);
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .rec-author {
+    font-family: var(--font-text);
+    font-size: 0.83rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .rec-desc {
+    font-family: var(--font-text);
+    font-size: 0.88rem;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .rec-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-pale);
+    border-radius: 20px;
+    font-family: var(--font-text);
+    font-size: 0.72rem;
+    color: var(--brown-mid);
+    font-style: italic;
+  }
+
+  /* ─── PANEL: MEDITATION ─── */
+  .meditation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 700px) { .meditation-grid { grid-template-columns: 1fr; } }
+
+  .breathe-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 2px 12px var(--card-shadow);
+    animation: fadeUp 0.35s ease both;
+  }
+  .breathe-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    margin-bottom: 4px;
+  }
+  .breathe-card .sub {
+    font-family: var(--font-text);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 26px;
+  }
+
+  .breathe-scene {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .breathe-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--amber-pale);
+    opacity: 0;
+  }
+  .breathe-ring.anim {
+    animation: pulseRing 4s cubic-bezier(0.2, 0.8, 0.3, 1) infinite;
+  }
+  .breathe-ring:nth-child(2) { animation-delay: 1.5s; }
+  .breathe-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--amber-light), var(--amber), var(--brown-mid));
+    box-shadow: 0 0 40px rgba(200,135,58,0.4);
+    position: relative;
+    z-index: 2;
+    transition: transform 0.1s linear;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+  }
+  .breathe-label {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--brown-mid);
+    margin-bottom: 6px;
+    font-style: italic;
+    min-height: 28px;
+  }
+  .breathe-count {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--amber);
+    font-weight: 700;
+    min-height: 44px;
+  }
+  .breathe-controls { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+
+  .sound-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .sound-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 18px 16px;
+    box-shadow: 0 2px 10px var(--card-shadow);
+    animation: fadeUp 0.4s ease both;
+    transition: all var(--transition);
+  }
+  .sound-card:hover { border-color: var(--amber-pale); }
+  .sound-card.playing {
+    border-color: var(--amber);
+    background: var(--amber-glow);
+  }
+  .sound-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .sound-info { display: flex; align-items: center; gap: 10px; }
+  .sound-emoji { font-size: 26px; }
+  .sound-name {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+  }
+  .sound-toggle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--amber);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--amber);
+    transition: all var(--transition);
+  }
+  .sound-toggle:hover,
+  .sound-card.playing .sound-toggle {
+    background: var(--amber);
+    color: white;
+  }
+  .sound-vol {
+    width: 100%;
+    accent-color: var(--amber);
+    cursor: pointer;
+    height: 4px;
+  }
+  .vol-label {
+    font-family: var(--font-text);
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .sound-col-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  /* ─── PANEL: NOTES ─── */
+  #panel-notes {
+    display: none;
+    flex-direction: row;
+    padding: 0;
+    gap: 0;
+  }
+  #panel-notes.active { display: flex; }
+
+  .notes-sidebar {
+    width: 220px;
+    min-width: 220px;
+    border-right: 1px solid var(--border-soft);
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .notes-sidebar-header {
+    padding: 18px 16px 12px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .notes-sidebar-header h3 {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+  }
+  .notes-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+  }
+  .note-item {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1px solid transparent;
+    margin-bottom: 4px;
+  }
+  .note-item:hover { background: var(--amber-pale); }
+  .note-item.active {
+    background: var(--amber-pale);
+    border-color: var(--amber-pale);
+  }
+  .note-item-title {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .note-item-preview {
+    font-family: var(--font-text);
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-style: italic;
+  }
+  .note-item-date {
+    font-family: var(--font-text);
+    font-size: 0.68rem;
+    color: var(--amber);
+    margin-top: 3px;
+  }
+
+  .notes-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .notes-editor-header {
+    padding: 16px 24px 12px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #note-title-input {
+    flex: 1;
+    border: none;
+    background: none;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--brown-dark);
+    outline: none;
+    font-style: italic;
+  }
+  #note-title-input::placeholder { color: var(--border-warm); }
+  .notes-toolbar { display: flex; gap: 8px; }
+  #note-body {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 20px 24px;
+    font-family: var(--font-text);
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--ink);
+    resize: none;
+    outline: none;
+  }
+  #note-body::placeholder { color: var(--border-warm); font-style: italic; }
+
+  /* ─── Loading spinner ─── */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border-warm);
+    border-top-color: var(--amber);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* ─── Loader/empty states ─── */
+  .loading-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    font-family: var(--font-text);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .no-key-msg {
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-pale);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    font-family: var(--font-text);
+    font-size: 0.9rem;
+    color: var(--brown-mid);
+    font-style: italic;
+  }
+
+  /* ─── Scrollbar in notes list ─── */
+  .notes-list::-webkit-scrollbar { width: 4px; }
+  .notes-list::-webkit-scrollbar-thumb { background: var(--amber-pale); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Sidebar ── -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">📖</span>
+      <h1>The Living Folio</h1>
+      <p>Your reading & wellness companion</p>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Companion</div>
+      <button class="nav-item active" data-panel="chat" onclick="switchPanel('chat', this)">
+        <span class="nav-icon">✨</span> Folio AI Chat
+      </button>
+
+      <div class="nav-section-label">Library</div>
+      <button class="nav-item" data-panel="library" onclick="switchPanel('library', this)">
+        <span class="nav-icon">🔍</span> Free Books
+      </button>
+      <button class="nav-item" data-panel="recs" onclick="switchPanel('recs', this)">
+        <span class="nav-icon">📚</span> Recommendations
+      </button>
+
+      <div class="nav-section-label">Wellness</div>
+      <button class="nav-item" data-panel="meditation" onclick="switchPanel('meditation', this)">
+        <span class="nav-icon">🌿</span> Meditation & Sound
+      </button>
+
+      <div class="nav-section-label">Personal</div>
+      <button class="nav-item" data-panel="notes" onclick="switchPanel('notes', this)">
+        <span class="nav-icon">🖊️</span> My Notes
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      "A reader lives a thousand lives before he dies." — G.R.R. Martin
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <div id="main">
+    <div id="topbar">
+      <span id="topbar-title">Folio AI Chat</span>
+      <div class="topbar-right">
+        <span class="topbar-time" id="clock"></span>
+      </div>
+    </div>
+
+    <div id="content">
+
+      <!-- ── Panel: Chat ── -->
+      <div id="panel-chat" class="panel active">
+        <div class="chat-topbar">
+          <div class="api-key-bar">
+            <span style="font-size:1.1rem">🌐</span>
+            <label>Connected via <strong>Pollinations AI</strong> — free, no account needed</label>
+            <span class="folio-status" style="margin-left:auto;flex-shrink:0"></span>
+            <span style="font-family:var(--font-text);font-size:0.78rem;color:var(--brown-light);font-style:italic;flex-shrink:0">Ready</span>
+          </div>
+          <div class="folio-persona">
+            <div class="folio-avatar">📜</div>
+            <div class="folio-info">
+              <h3>Folio</h3>
+              <p><span class="folio-status"></span>Literary Companion · Ready to explore with you</p>
+            </div>
+          </div>
+          <div class="quick-prompts">
+            <button class="quick-btn" onclick="sendQuick('Suggest a book for me based on a cozy evening mood')">📚 Book suggestion</button>
+            <button class="quick-btn" onclick="sendQuick('Guide me through a short mindfulness meditation')">🧘 Meditate with me</button>
+            <button class="quick-btn" onclick="sendQuick('Where can I find free classic books to read online?')">🌐 Find free books</button>
+            <button class="quick-btn" onclick="sendQuick('Share an inspiring literary quote and explain its meaning')">✨ Inspire me</button>
+            <button class="quick-btn" onclick="sendQuick('What should I read if I love philosophical fiction?')">🔮 Philosophy &amp; fiction</button>
+            <button class="quick-btn" onclick="sendQuick('Tell me about the Stoic philosophy of Marcus Aurelius')">🏛️ Stoic wisdom</button>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea id="chat-input" rows="1" placeholder="Ask Folio anything — books, quotes, mindfulness…" onkeydown="chatKeydown(event)"></textarea>
+            <button id="chat-send" onclick="sendChat()">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panel: Library ── -->
+      <div id="panel-library" class="panel">
+        <div class="section-title">📚 Free Books Library</div>
+        <p class="section-sub">Search millions of books via Open Library · Click any book to open it</p>
+        <div class="search-row">
+          <input type="text" class="search-input" id="book-search" placeholder="Search by title, author, or subject…" onkeydown="if(event.key==='Enter') searchBooks()" />
+          <button class="btn btn-primary" onclick="searchBooks()">🔍 Search</button>
+          <button class="btn btn-secondary" onclick="searchBooks('classic literature')">Classics</button>
+          <button class="btn btn-secondary" onclick="searchBooks('philosophy')">Philosophy</button>
+        </div>
+        <div class="books-grid" id="books-grid">
+          <div class="library-empty">
+            <div class="empty-icon">📖</div>
+            <p>Search for a book above to begin your journey…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panel: Recommendations ── -->
+      <div id="panel-recs" class="panel">
+        <div class="section-title">✨ Curated Recommendations</div>
+        <p class="section-sub">Hand-picked books for your soul · Choose a genre to explore</p>
+        <div class="genre-tabs" id="genre-tabs"></div>
+        <div class="rec-grid" id="rec-grid"></div>
+      </div>
+
+      <!-- ── Panel: Meditation ── -->
+      <div id="panel-meditation" class="panel">
+        <div class="section-title">🌿 Meditation & Stillness</div>
+        <p class="section-sub">Breathe. Listen. Be still.</p>
+        <div class="meditation-grid">
+          <!-- Breathing -->
+          <div class="breathe-card">
+            <h3>Box Breathing</h3>
+            <p class="sub">4 · 4 · 4 · 4 — Inhale · Hold · Exhale · Hold</p>
+            <div class="breathe-scene">
+              <div class="breathe-ring" id="ring1"></div>
+              <div class="breathe-ring" id="ring2"></div>
+              <div class="breathe-circle" id="breathe-circle">🌬️</div>
+            </div>
+            <div class="breathe-label" id="breathe-label">Ready to begin</div>
+            <div class="breathe-count" id="breathe-count"></div>
+            <div class="breathe-controls">
+              <button class="btn btn-primary" id="breathe-btn" onclick="toggleBreathe()">▶ Begin</button>
+              <button class="btn btn-secondary" onclick="resetBreathe()">↺ Reset</button>
+            </div>
+          </div>
+
+          <!-- Ambient Sounds -->
+          <div>
+            <div class="sound-col-title">🔊 Ambient Sounds</div>
+            <div class="sound-cards" id="sound-cards"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panel: Notes ── -->
+      <div id="panel-notes" class="panel">
+        <div class="notes-sidebar">
+          <div class="notes-sidebar-header">
+            <h3>My Notes</h3>
+            <button class="btn btn-primary btn-sm" onclick="newNote()">+ New</button>
+          </div>
+          <div class="notes-list" id="notes-list"></div>
+        </div>
+        <div class="notes-editor">
+          <div class="notes-editor-header">
+            <input type="text" id="note-title-input" placeholder="Note title…" oninput="saveCurrentNote()" />
+            <div class="notes-toolbar">
+              <button class="btn btn-secondary btn-sm" onclick="deleteCurrentNote()">🗑 Delete</button>
+            </div>
+          </div>
+          <textarea id="note-body" placeholder="Begin writing… your thoughts are safe here." oninput="saveCurrentNote()"></textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Reader Modal ── -->
+<div id="reader-modal" class="modal-overlay" style="display:none" onclick="closeReaderModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-cover" id="modal-cover">📖</div>
+      <div class="modal-meta">
+        <h2 id="modal-title">Book Title</h2>
+        <div class="author" id="modal-author">Author</div>
+        <div class="modal-actions">
+          <button class="btn btn-primary btn-sm" id="tts-btn" onclick="toggleTTS()">🔊 Read Aloud</button>
+          <button class="btn btn-secondary btn-sm" onclick="stopTTS()">⏹ Stop</button>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeReaderModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div class="loading-row"><div class="spinner"></div> Loading book preview…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  GLOBALS & STATE
+// ══════════════════════════════════════════════════════════
+let currentNote = null;
+let notes = JSON.parse(localStorage.getItem('folio_notes') || '[]');
+let breatheActive = false;
+let breatheInterval = null;
+let breathePhase = 0;
+let breatheCount = 4;
+let ttsUtterance = null;
+let currentModalText = '';
+let audioCtx = null;
+let soundNodes = {};
+let chatHistory = [];
+
+const PANEL_TITLES = {
+  chat:      'Folio AI Chat',
+  library:   'Free Books Library',
+  recs:      'Curated Recommendations',
+  meditation:'Meditation & Stillness',
+  notes:     'My Notes'
+};
+
+// ══════════════════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════
+function switchPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbar-title').textContent = PANEL_TITLES[name] || name;
+
+  if (name === 'recs') renderRecs(activeGenre);
+  if (name === 'notes') renderNotesList();
+}
+
+// ══════════════════════════════════════════════════════════
+//  POLLINATIONS AI — free, no key needed
+// ══════════════════════════════════════════════════════════
+const POLLINATIONS_URL = 'https://text.pollinations.ai/openai';
+
+// ══════════════════════════════════════════════════════════
+//  CHAT
+// ══════════════════════════════════════════════════════════
+const FOLIO_SYSTEM = `You are Folio, a warm, wise, and literary AI companion living inside "The Living Folio" — a cozy reading and wellness app. Your personality:
+- Deeply literary: you love books, quotes, authors, poetry, and philosophy
+- Warm and nurturing: you speak like a beloved librarian-mentor
+- Occasionally poetic: you use gentle metaphors and vivid imagery
+- Knowledgeable: about mindfulness, stoicism, literature, wellness
+- Concise but meaningful: never rambling, always intentional
+
+When suggesting books, give title, author, and a one-sentence soul of the book. When guiding meditations, be gentle and sensory. Use em dashes, ellipses, and italics naturally. Begin responses with warmth. You may use occasional emoji but sparingly.`;
+
+const chatMsgs = document.getElementById('chat-messages');
+
+function addFolioMsg(text, isTyping = false) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-folio';
+  div.innerHTML = `
+    <div class="msg-avatar">📜</div>
+    <div class="msg-bubble">${isTyping
+      ? '<div class="typing-dots"><span></span><span></span><span></span></div>'
+      : formatMsg(text)
+    }</div>`;
+  chatMsgs.appendChild(div);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  return div;
+}
+
+function addUserMsg(text) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-user';
+  div.innerHTML = `<div class="msg-avatar">🧑</div><div class="msg-bubble">${escapeHtml(text)}</div>`;
+  chatMsgs.appendChild(div);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+}
+
+function formatMsg(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/_(.*?)_/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  sendMessage(text);
+}
+
+async function sendQuick(prompt) {
+  switchPanel('chat', document.querySelector('[data-panel="chat"]'));
+  sendMessage(prompt);
+}
+
+async function sendMessage(text) {
+  addUserMsg(text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const typingDiv = addFolioMsg('', true);
+
+  const messages = [
+    { role: 'system', content: FOLIO_SYSTEM },
+    ...chatHistory.slice(-12)
+  ];
+
+  try {
+    const response = await fetch(POLLINATIONS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'openai',
+        messages,
+        temperature: 0.85,
+        max_tokens: 700,
+        stream: false,
+        private: true
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Service error (${response.status})`);
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content?.trim()
+      || 'Hmm, the pages seem to have gone quiet… try again in a moment?';
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    typingDiv.querySelector('.msg-bubble').innerHTML = formatMsg(reply);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  } catch (err) {
+    typingDiv.querySelector('.msg-bubble').innerHTML =
+      `<em>The connection flickered — ${escapeHtml(err.message)}. Please try again.</em>`;
+  }
+}
+
+// Initial Folio greeting
+addFolioMsg(`Welcome, dear reader. I'm *Folio* — your literary companion in this quiet corner of the web.\n\nI'm powered by AI and ready to talk books, mindfulness, philosophy, or whatever your heart needs today. What draws you here?`);
+
+// ══════════════════════════════════════════════════════════
+//  LIBRARY
+// ══════════════════════════════════════════════════════════
+async function searchBooks(query) {
+  const q = query || document.getElementById('book-search').value.trim();
+  if (!q) return;
+  document.getElementById('book-search').value = q;
+  const grid = document.getElementById('books-grid');
+  grid.innerHTML = '<div class="loading-row"><div class="spinner"></div> Searching the vast library…</div>';
+
+  try {
+    const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=24&fields=key,title,author_name,first_publish_year,cover_i,ia`);
+    const data = await res.json();
+    if (!data.docs || data.docs.length === 0) {
+      grid.innerHTML = '<div class="library-empty"><div class="empty-icon">🔍</div><p>No books found. Try a different search.</p></div>';
+      return;
+    }
+    grid.innerHTML = '';
+    data.docs.forEach((book, i) => {
+      const card = document.createElement('div');
+      card.className = 'book-card';
+      card.style.animationDelay = (i * 0.04) + 's';
+      const coverUrl = book.cover_i
+        ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+        : null;
+      card.innerHTML = `
+        ${coverUrl
+          ? `<div class="book-cover"><img src="${coverUrl}" alt="cover" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'book-cover-placeholder\\'>📖</div>'"></div>`
+          : '<div class="book-cover-placeholder">📖</div>'
+        }
+        <div class="book-info">
+          <div class="book-title">${escapeHtml(book.title)}</div>
+          <div class="book-author">${escapeHtml((book.author_name||['Unknown'])[0])}</div>
+          ${book.first_publish_year ? `<div class="book-year">${book.first_publish_year}</div>` : ''}
+        </div>`;
+      card.onclick = () => openBook(book, coverUrl);
+      grid.appendChild(card);
+    });
+  } catch (e) {
+    grid.innerHTML = '<div class="library-empty"><div class="empty-icon">⚠️</div><p>Couldn\'t reach the library. Check your connection.</p></div>';
+  }
+}
+
+async function openBook(book, coverUrl) {
+  document.getElementById('reader-modal').style.display = 'flex';
+  document.getElementById('modal-title').textContent = book.title;
+  document.getElementById('modal-author').textContent = (book.author_name || ['Unknown Author'])[0];
+  const coverEl = document.getElementById('modal-cover');
+  coverEl.innerHTML = coverUrl
+    ? `<img src="${coverUrl}" alt="cover" onerror="this.parentElement.innerHTML='📖'">`
+    : '📖';
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = '<div class="loading-row"><div class="spinner"></div> Loading book preview…</div>';
+  currentModalText = '';
+
+  // Try to get description from Open Library
+  try {
+    const res = await fetch(`https://openlibrary.org${book.key}.json`);
+    const data = await res.json();
+    let desc = '';
+    if (data.description) {
+      desc = typeof data.description === 'string' ? data.description : (data.description.value || '');
+    }
+    const iaId = (book.ia && book.ia[0]) || null;
+    const gutenbergSearch = `https://www.gutenberg.org/ebooks/search/?query=${encodeURIComponent(book.title)}`;
+    const olLink = `https://openlibrary.org${book.key}`;
+
+    let html = '';
+    if (desc) {
+      currentModalText = desc;
+      html += `<p>${escapeHtml(desc)}</p>`;
+    } else {
+      html += `<p><em>No preview available for this book. Explore it on the external sites below.</em></p>`;
+    }
+
+    if (iaId) {
+      html += `<p>This book may be freely readable on the Internet Archive.</p>`;
+    }
+
+    html += `<div class="modal-links">
+      <a class="ext-link" href="${olLink}" target="_blank">📖 Open Library</a>
+      <a class="ext-link" href="${gutenbergSearch}" target="_blank">📜 Project Gutenberg</a>
+      ${iaId ? `<a class="ext-link" href="https://archive.org/details/${iaId}" target="_blank">🏛 Internet Archive</a>` : ''}
+    </div>`;
+
+    body.innerHTML = html;
+  } catch(e) {
+    body.innerHTML = `
+      <p><em>Could not load book details. Explore this book on the links below.</em></p>
+      <div class="modal-links">
+        <a class="ext-link" href="https://openlibrary.org${book.key}" target="_blank">📖 Open Library</a>
+        <a class="ext-link" href="https://www.gutenberg.org/ebooks/search/?query=${encodeURIComponent(book.title)}" target="_blank">📜 Project Gutenberg</a>
+      </div>`;
+  }
+}
+
+function closeReaderModal(e) {
+  if (e && e.target !== document.getElementById('reader-modal') && e.type === 'click') return;
+  stopTTS();
+  document.getElementById('reader-modal').style.display = 'none';
+}
+
+// ── TTS ──
+function toggleTTS() {
+  if (window.speechSynthesis.speaking) { stopTTS(); return; }
+  const text = currentModalText || document.getElementById('modal-title').textContent;
+  if (!text) return;
+  ttsUtterance = new SpeechSynthesisUtterance(text);
+  ttsUtterance.rate = 0.9;
+  ttsUtterance.pitch = 1;
+  window.speechSynthesis.speak(ttsUtterance);
+  document.getElementById('tts-btn').textContent = '⏸ Pause';
+  ttsUtterance.onend = () => { document.getElementById('tts-btn').textContent = '🔊 Read Aloud'; };
+}
+function stopTTS() {
+  window.speechSynthesis.cancel();
+  document.getElementById('tts-btn').textContent = '🔊 Read Aloud';
+}
+
+// ══════════════════════════════════════════════════════════
+//  RECOMMENDATIONS
+// ══════════════════════════════════════════════════════════
+const REC_BOOKS = [
+  { genre:'Philosophy', emoji:'🏛', title:'Meditations', author:'Marcus Aurelius', desc:'A Roman emperor\'s private journal of Stoic philosophy — raw, honest, and enduringly relevant to daily life.' },
+  { genre:'Philosophy', emoji:'⚖️', title:'The Republic', author:'Plato', desc:'Socrates explores justice, beauty, and equality in this cornerstone of Western philosophical thought.' },
+  { genre:'Philosophy', emoji:'🌱', title:'Thus Spoke Zarathustra', author:'Friedrich Nietzsche', desc:'A poetic philosophical novel introducing the Übermensch and challenging conventional morality.' },
+  { genre:'Philosophy', emoji:'🕯', title:'Letters from a Stoic', author:'Seneca', desc:'Intimate letters on friendship, time, death, and virtue from one of antiquity\'s greatest minds.' },
+  { genre:'Philosophy', emoji:'🌀', title:'Being and Time', author:'Martin Heidegger', desc:'A transformative inquiry into the meaning of Being, authenticity, and what it means to exist.' },
+  { genre:'Philosophy', emoji:'🪷', title:'The Tao Te Ching', author:'Lao Tzu', desc:'Eighty-one short verses on the nature of existence, wisdom, and living in harmony with the world.' },
+
+  { genre:'Mindfulness', emoji:'🧘', title:'The Miracle of Mindfulness', author:'Thich Nhat Hanh', desc:'A gentle, practical guide to cultivating present-moment awareness in every aspect of daily life.' },
+  { genre:'Mindfulness', emoji:'🌊', title:'Full Catastrophe Living', author:'Jon Kabat-Zinn', desc:'The definitive guide to using mindfulness meditation to confront stress, pain, and illness.' },
+  { genre:'Mindfulness', emoji:'☀️', title:'The Power of Now', author:'Eckhart Tolle', desc:'A spiritual guide to transcending thought and finding deep peace in the present moment.' },
+  { genre:'Mindfulness', emoji:'🌿', title:'Wherever You Go, There You Are', author:'Jon Kabat-Zinn', desc:'Mindfulness meditation in its essence — accessible, wise, and perfect for modern life.' },
+  { genre:'Mindfulness', emoji:'💧', title:'Waking Up', author:'Sam Harris', desc:'An atheist\'s case for spirituality and the transformative potential of meditation and consciousness.' },
+
+  { genre:'Fiction', emoji:'🏡', title:'Middlemarch', author:'George Eliot', desc:'A sweeping portrait of provincial life in Victorian England — arguably the greatest English novel ever written.' },
+  { genre:'Fiction', emoji:'🌙', title:'The Brothers Karamazov', author:'Fyodor Dostoevsky', desc:'A passionate and complex exploration of faith, doubt, free will, and morality in 19th-century Russia.' },
+  { genre:'Fiction', emoji:'🎪', title:'One Hundred Years of Solitude', author:'Gabriel García Márquez', desc:'The Buendía family\'s multi-generational saga in Macondo — a masterpiece of magical realism.' },
+  { genre:'Fiction', emoji:'🌅', title:'To the Lighthouse', author:'Virginia Woolf', desc:'A luminous stream-of-consciousness meditation on time, loss, and the nature of artistic perception.' },
+  { genre:'Fiction', emoji:'🦋', title:'Steppenwolf', author:'Hermann Hesse', desc:'A troubled intellectual\'s journey toward self-acceptance and the reconciliation of his dual nature.' },
+  { genre:'Fiction', emoji:'📜', title:'Don Quixote', author:'Miguel de Cervantes', desc:'The world\'s first modern novel — the misadventures of a man who confuses fiction with reality.' },
+
+  { genre:'Science', emoji:'🔭', title:'A Brief History of Time', author:'Stephen Hawking', desc:'The universe\'s origins, black holes, and the nature of time explained for the curious non-scientist.' },
+  { genre:'Science', emoji:'🧬', title:'The Selfish Gene', author:'Richard Dawkins', desc:'A revolutionary perspective on evolution from the viewpoint of the gene itself.' },
+  { genre:'Science', emoji:'⚛️', title:'The Elegant Universe', author:'Brian Greene', desc:'Superstrings, hidden dimensions, and the quest for a grand unified theory of everything.' },
+  { genre:'Science', emoji:'🌌', title:'Cosmos', author:'Carl Sagan', desc:'A poetic journey through space and time that connects science, history, and human meaning.' },
+  { genre:'Science', emoji:'🧠', title:'Thinking, Fast and Slow', author:'Daniel Kahneman', desc:'The Nobel laureate\'s exploration of the two systems that drive the way we think and make decisions.' },
+
+  { genre:'Poetry', emoji:'🌹', title:'Selected Poems', author:'Pablo Neruda', desc:'Sensuous, political, and deeply human — Neruda\'s love poetry transcends all language barriers.' },
+  { genre:'Poetry', emoji:'🕊', title:'Leaves of Grass', author:'Walt Whitman', desc:'A groundbreaking celebration of democracy, nature, love, and the self in free verse.' },
+  { genre:'Poetry', emoji:'⛰️', title:'The Complete Poems', author:'Emily Dickinson', desc:'Slant rhymes and dashes conceal one of literature\'s most radical and original inner lives.' },
+  { genre:'Poetry', emoji:'🌊', title:'The Waste Land', author:'T.S. Eliot', desc:'A fragmented modernist masterpiece charting the spiritual desolation of post-WWI Europe.' },
+  { genre:'Poetry', emoji:'🔥', title:'Ariel', author:'Sylvia Plath', desc:'Raw, confessional, devastating — Plath\'s posthumous collection is a landmark of 20th-century poetry.' },
+
+  { genre:'Self Growth', emoji:'🌻', title:'Man\'s Search for Meaning', author:'Viktor E. Frankl', desc:'A psychiatrist\'s account of surviving the Holocaust and finding purpose even in suffering.' },
+  { genre:'Self Growth', emoji:'🎯', title:'Atomic Habits', author:'James Clear', desc:'A practical framework for building good habits and breaking bad ones through tiny, consistent changes.' },
+  { genre:'Self Growth', emoji:'🧭', title:'The 7 Habits of Highly Effective People', author:'Stephen Covey', desc:'Principle-centered approaches to personal and professional effectiveness that have stood the test of time.' },
+  { genre:'Self Growth', emoji:'💡', title:'Deep Work', author:'Cal Newport', desc:'The case for focused, distraction-free work in an increasingly shallow and noisy world.' },
+  { genre:'Self Growth', emoji:'🌄', title:'The Alchemist', author:'Paulo Coelho', desc:'A shepherd boy\'s allegorical journey to find treasure teaches us to listen to our hearts and follow our dreams.' },
+];
+
+const GENRES = ['Philosophy','Mindfulness','Fiction','Science','Poetry','Self Growth'];
+let activeGenre = 'Philosophy';
+
+function renderRecs(genre) {
+  activeGenre = genre;
+  const tabsEl = document.getElementById('genre-tabs');
+  tabsEl.innerHTML = GENRES.map(g =>
+    `<button class="genre-tab ${g===genre?'active':''}" onclick="renderRecs('${g}')">${g}</button>`
+  ).join('');
+
+  const books = REC_BOOKS.filter(b => b.genre === genre);
+  document.getElementById('rec-grid').innerHTML = books.map((b, i) =>
+    `<div class="rec-card" style="animation-delay:${i*0.05}s">
+      <div class="rec-emoji">${b.emoji}</div>
+      <div class="rec-title">${escapeHtml(b.title)}</div>
+      <div class="rec-author">by ${escapeHtml(b.author)}</div>
+      <div class="rec-desc">${escapeHtml(b.desc)}</div>
+      <span class="rec-badge">${escapeHtml(b.genre)}</span>
+    </div>`
+  ).join('');
+}
+renderRecs('Philosophy');
+
+// ══════════════════════════════════════════════════════════
+//  BREATHING EXERCISE
+// ══════════════════════════════════════════════════════════
+const PHASES = [
+  { label: 'Inhale…',      duration: 4, scale: 1.55 },
+  { label: 'Hold…',        duration: 4, scale: 1.55 },
+  { label: 'Exhale…',      duration: 4, scale: 1.0  },
+  { label: 'Hold…',        duration: 4, scale: 1.0  },
+];
+
+let breathePhaseIndex = 0;
+let breatheTimer = null;
+let breatheCountdown = 4;
+let breatheRunning = false;
+
+function toggleBreathe() {
+  if (breatheRunning) { pauseBreathe(); return; }
+  breatheRunning = true;
+  document.getElementById('breathe-btn').textContent = '⏸ Pause';
+  document.getElementById('ring1').classList.add('anim');
+  document.getElementById('ring2').classList.add('anim');
+  runBreathPhase();
+}
+
+function runBreathPhase() {
+  if (!breatheRunning) return;
+  const phase = PHASES[breathePhaseIndex];
+  breatheCountdown = phase.duration;
+  document.getElementById('breathe-label').textContent = phase.label;
+  document.getElementById('breathe-count').textContent = breatheCountdown;
+
+  const circle = document.getElementById('breathe-circle');
+  const transitionMs = phase.duration * 1000 * 0.9;
+  circle.style.transition = `transform ${transitionMs}ms cubic-bezier(0.45, 0, 0.55, 1)`;
+  circle.style.transform = `scale(${phase.scale})`;
+
+  breatheTimer = setInterval(() => {
+    breatheCountdown--;
+    document.getElementById('breathe-count').textContent = breatheCountdown <= 0 ? '' : breatheCountdown;
+    if (breatheCountdown <= 0) {
+      clearInterval(breatheTimer);
+      breathePhaseIndex = (breathePhaseIndex + 1) % PHASES.length;
+      setTimeout(runBreathPhase, 200);
+    }
+  }, 1000);
+}
+
+function pauseBreathe() {
+  breatheRunning = false;
+  clearInterval(breatheTimer);
+  document.getElementById('breathe-btn').textContent = '▶ Resume';
+  document.getElementById('breathe-label').textContent = 'Paused';
+  document.getElementById('breathe-count').textContent = '';
+}
+
+function resetBreathe() {
+  breatheRunning = false;
+  clearInterval(breatheTimer);
+  breathePhaseIndex = 0;
+  document.getElementById('breathe-btn').textContent = '▶ Begin';
+  document.getElementById('breathe-label').textContent = 'Ready to begin';
+  document.getElementById('breathe-count').textContent = '';
+  document.getElementById('breathe-circle').style.transform = 'scale(1)';
+  document.getElementById('ring1').classList.remove('anim');
+  document.getElementById('ring2').classList.remove('anim');
+}
+
+// ══════════════════════════════════════════════════════════
+//  AMBIENT SOUNDS (Web Audio API)
+// ══════════════════════════════════════════════════════════
+const SOUNDS = [
+  { id: 'rain',   name: 'Rain',          emoji: '🌧' },
+  { id: 'forest', name: 'Forest Birds',  emoji: '🌲' },
+  { id: 'ocean',  name: 'Ocean Waves',   emoji: '🌊' },
+  { id: 'fire',   name: 'Crackling Fire',emoji: '🔥' },
+];
+
+function initAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+// Sound generators
+function createRainSound(ctx) {
+  const bufferSize = ctx.sampleRate * 3;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 400;
+  filter.Q.value = 0.5;
+  const filter2 = ctx.createBiquadFilter();
+  filter2.type = 'lowpass';
+  filter2.frequency.value = 1200;
+  source.connect(filter);
+  filter.connect(filter2);
+  source.start();
+  return { source, output: filter2 };
+}
+
+function createForestSound(ctx) {
+  const nodes = [];
+  // Base gentle wind
+  const bufferSize = ctx.sampleRate * 4;
+  const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) d[i] = (Math.random() * 2 - 1) * 0.3;
+  const wind = ctx.createBufferSource();
+  wind.buffer = buf;
+  wind.loop = true;
+  const filt = ctx.createBiquadFilter();
+  filt.type = 'lowpass';
+  filt.frequency.value = 600;
+  wind.connect(filt);
+  wind.start();
+  nodes.push(wind);
+
+  // Bird chirps using oscillators
+  const merger = ctx.createChannelMerger ? null : null;
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = 1;
+  filt.connect(gainNode);
+
+  function chirp() {
+    if (!nodes._active) return;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    const freq = 2000 + Math.random() * 1500;
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+    g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18 + Math.random() * 0.12);
+    osc.connect(g);
+    g.connect(gainNode);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.35);
+    setTimeout(chirp, 600 + Math.random() * 2200);
+  }
+  nodes._active = true;
+  setTimeout(chirp, 300);
+  setTimeout(chirp, 900);
+
+  return { source: { stop: () => { nodes._active = false; wind.stop(); nodes.forEach(n => { try { n.stop && n.stop(); } catch(e){} }); } }, output: gainNode, customStop: true };
+}
+
+function createOceanSound(ctx) {
+  const bufferSize = ctx.sampleRate * 4;
+  const buffer = ctx.createBuffer(2, bufferSize, ctx.sampleRate);
+  for (let c = 0; c < 2; c++) {
+    const d = buffer.getChannelData(c);
+    for (let i = 0; i < bufferSize; i++) d[i] = (Math.random() * 2 - 1);
+  }
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 500;
+  const waveLfo = ctx.createOscillator();
+  waveLfo.frequency.value = 0.12;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 200;
+  waveLfo.connect(lfoGain);
+  lfoGain.connect(lp.frequency);
+  waveLfo.start();
+  source.connect(lp);
+  source.start();
+  return { source, output: lp, extra: waveLfo };
+}
+
+function createFireSound(ctx) {
+  const bufferSize = ctx.sampleRate * 2;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const d = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) d[i] = (Math.random() * 2 - 1);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 800;
+  const hp = ctx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 80;
+  // Crackle LFO
+  const crackLfo = ctx.createOscillator();
+  crackLfo.frequency.value = 8 + Math.random() * 4;
+  crackLfo.type = 'sawtooth';
+  const crackGain = ctx.createGain();
+  crackGain.gain.value = 100;
+  crackLfo.connect(crackGain);
+  crackGain.connect(lp.frequency);
+  crackLfo.start();
+  source.connect(hp);
+  hp.connect(lp);
+  source.start();
+  return { source, output: lp, extra: crackLfo };
+}
+
+const soundCreators = { rain: createRainSound, forest: createForestSound, ocean: createOceanSound, fire: createFireSound };
+
+function buildSoundCards() {
+  const container = document.getElementById('sound-cards');
+  container.style.gridTemplateColumns = '1fr 1fr';
+  container.style.display = 'grid';
+  container.style.gap = '14px';
+
+  SOUNDS.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'sound-card';
+    card.id = `sound-card-${s.id}`;
+    card.innerHTML = `
+      <div class="sound-top">
+        <div class="sound-info">
+          <span class="sound-emoji">${s.emoji}</span>
+          <span class="sound-name">${s.name}</span>
+        </div>
+        <button class="sound-toggle" id="toggle-${s.id}" onclick="toggleSound('${s.id}')">▶</button>
+      </div>
+      <div class="vol-label"><span>Volume</span><span id="vol-val-${s.id}">50%</span></div>
+      <input type="range" class="sound-vol" id="vol-${s.id}" min="0" max="100" value="50"
+             oninput="setVolume('${s.id}', this.value)">
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleSound(id) {
+  initAudioCtx();
+  const card = document.getElementById(`sound-card-${id}`);
+  const btn = document.getElementById(`toggle-${id}`);
+  if (soundNodes[id]) {
+    // Stop
+    try {
+      if (soundNodes[id].customStop) {
+        soundNodes[id].source.stop();
+      } else {
+        soundNodes[id].source.stop();
+        if (soundNodes[id].extra) soundNodes[id].extra.stop();
+      }
+    } catch(e) {}
+    soundNodes[id].gainNode.disconnect();
+    delete soundNodes[id];
+    card.classList.remove('playing');
+    btn.textContent = '▶';
+  } else {
+    // Start
+    const creator = soundCreators[id];
+    if (!creator) return;
+    const nodes = creator(audioCtx);
+    const gainNode = audioCtx.createGain();
+    const vol = document.getElementById(`vol-${id}`).value / 100;
+    gainNode.gain.value = vol * 0.4;
+    nodes.output.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    soundNodes[id] = { ...nodes, gainNode };
+    card.classList.add('playing');
+    btn.textContent = '⏸';
+  }
+}
+
+function setVolume(id, val) {
+  document.getElementById(`vol-val-${id}`).textContent = val + '%';
+  if (soundNodes[id]) {
+    soundNodes[id].gainNode.gain.value = (val / 100) * 0.4;
+  }
+}
+
+buildSoundCards();
+
+// ══════════════════════════════════════════════════════════
+//  NOTES
+// ══════════════════════════════════════════════════════════
+function saveNotes() {
+  localStorage.setItem('folio_notes', JSON.stringify(notes));
+}
+
+function renderNotesList() {
+  const list = document.getElementById('notes-list');
+  if (notes.length === 0) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;font-family:var(--font-text);font-style:italic;color:var(--ink-soft);font-size:0.85rem;">No notes yet. Click + New to begin writing.</div>';
+    return;
+  }
+  list.innerHTML = notes.map((n, i) =>
+    `<div class="note-item ${currentNote===i?'active':''}" onclick="selectNote(${i})">
+      <div class="note-item-title">${escapeHtml(n.title || 'Untitled')}</div>
+      <div class="note-item-preview">${escapeHtml((n.body||'').slice(0,40))}</div>
+      <div class="note-item-date">${new Date(n.updated||n.created).toLocaleDateString()}</div>
+    </div>`
+  ).join('');
+}
+
+function selectNote(i) {
+  currentNote = i;
+  const n = notes[i];
+  document.getElementById('note-title-input').value = n.title || '';
+  document.getElementById('note-body').value = n.body || '';
+  renderNotesList();
+}
+
+function newNote() {
+  const n = { title: '', body: '', created: Date.now(), updated: Date.now() };
+  notes.unshift(n);
+  saveNotes();
+  currentNote = 0;
+  document.getElementById('note-title-input').value = '';
+  document.getElementById('note-body').value = '';
+  renderNotesList();
+  document.getElementById('note-title-input').focus();
+}
+
+function saveCurrentNote() {
+  if (currentNote === null || !notes[currentNote]) return;
+  notes[currentNote].title = document.getElementById('note-title-input').value;
+  notes[currentNote].body  = document.getElementById('note-body').value;
+  notes[currentNote].updated = Date.now();
+  saveNotes();
+  renderNotesList();
+}
+
+function deleteCurrentNote() {
+  if (currentNote === null) return;
+  if (!confirm('Delete this note?')) return;
+  notes.splice(currentNote, 1);
+  currentNote = notes.length > 0 ? 0 : null;
+  saveNotes();
+  if (currentNote !== null) selectNote(0);
+  else {
+    document.getElementById('note-title-input').value = '';
+    document.getElementById('note-body').value = '';
+  }
+  renderNotesList();
+}
+
+// Init notes
+renderNotesList();
+if (notes.length > 0) selectNote(0);
+
+// Pollinations AI — no API key needed
+
+// ══════════════════════════════════════════════════════════
+//  AUTO-RESIZE TEXTAREA
+// ══════════════════════════════════════════════════════════
+document.getElementById('chat-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+</script>
+</body>
+</html>
